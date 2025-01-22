@@ -39,12 +39,12 @@ export const Widget = () => {
   });
   const [copied, setCopied] = useState(false);
 
-  const handleConfigChange = (key: ConfigKeys, value: any) => {
-    setConfig(prevConfig => ({
-      ...prevConfig,
-      [key]: value,
-    }));
-  };
+  const handleConfigChange = (key: ConfigKeys, value: string | number | boolean | React.CSSProperties | number[] | undefined) => {
+      setConfig(prevConfig => ({
+        ...prevConfig,
+        [key]: value,
+      }));
+    };
 
   const currentUrl = window.location.origin;
   const embedCode = `

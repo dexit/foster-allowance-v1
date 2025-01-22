@@ -25,7 +25,7 @@ const defaultConfig: Config = {
   googleAnalytics: '', // Default value for googleAnalytics
 };
 
-const Embed: React.FC = () => {
+const Embed: React.FC & { init?: (configCallback?: () => Config) => void } = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const configParam = queryParams.get('config');
   let config: Config = defaultConfig;
@@ -63,7 +63,7 @@ const Embed: React.FC = () => {
   );
 };
 
-Embed.init = (configCallback?: () => Config) => {
+Embed.init = function (configCallback?: () => Config) {
   let config: Config = defaultConfig;
   if (configCallback && typeof configCallback === 'function') {
     config = { ...config, ...configCallback() };

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import Embed from './pages/Embed';
-import { Config } from './pages/Index'; // Import Config type
+import Config from './pages/Index'; // Import Config type
 
 const root = document.getElementById('root');
 if (root) {
@@ -17,7 +17,7 @@ if (root) {
 // Ensure Embed has an init method
 if (typeof Embed.init === 'function') {
   // Expose the Embed initialization function globally
-  (window as any).initFosterAllowanceEmbed = (config?: Config) => {
+  (window as typeof window & { initFosterAllowanceEmbed?: (config?: typeof Config) => void }).initFosterAllowanceEmbed = (config?: typeof Config) => {
     Embed.init(config);
   };
 } else {

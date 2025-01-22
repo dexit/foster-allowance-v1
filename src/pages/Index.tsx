@@ -38,7 +38,7 @@ export default function Index({ config }: { config?: Config }) {
       weekIntervals: [{ start: 1, end: 52 }]
     }
   ]);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{ children: { ageGroup: string; baseAllowance: number; ageRelatedElement: number; specialCareAmount: number; totalAllowance: number; }[]; weeklyTotal: number; monthlyTotal: number; yearlyTotal: number } | null>(null);
   const { toast } = useToast();
 
   const handleUserInfoSubmit = async (data: UserInfoFormData) => {
@@ -90,7 +90,16 @@ export default function Index({ config }: { config?: Config }) {
     setIsLoading(true);
     try {
       const allowance = calculateTotalAllowance(children, userInfo.isExperiencedCarer);
-      setResult(allowance);
+      setResult({ 
+        ...allowance, 
+        children: children.map(child => ({
+          ...child,
+          baseAllowance: 0, // Replace with actual calculation
+          ageRelatedElement: 0, // Replace with actual calculation
+          specialCareAmount: 0, // Replace with actual calculation
+          totalAllowance: 0 // Replace with actual calculation
+        }))
+      });
       setStep('results');
 
       // Use the submitUrl from config
