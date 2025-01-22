@@ -13,7 +13,16 @@ import jsPDF from "jspdf";
 
 type Step = 'info' | 'children' | 'results';
 
-export default function Index() {
+interface Config {
+  submitUrl?: string;
+  allowances?: number[];
+  showLogo?: boolean;
+  theme?: 'light' | 'dark';
+  title?: string;
+  googleAnalytics?: string; // Added googleAnalytics property
+}
+
+export default function Index({ config }: { config?: Config }) {
   const [step, setStep] = useState<Step>('info');
   const [isLoading, setIsLoading] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfoFormData>({
@@ -83,14 +92,14 @@ export default function Index() {
       const allowance = calculateTotalAllowance(children, userInfo.isExperiencedCarer);
       setResult(allowance);
       setStep('results');
-      
-      // Simulate API submission
-      await fetch('https://api.example.com/foster-allowance', {
+
+      // Use the submitUrl from config
+      await fetch(config?.submitUrl || 'https://api.example.com/foster-allowance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userInfo, children, allowance })
       });
-      
+
       toast({
         title: "Calculation Complete",
         description: "Your foster allowance has been calculated and saved.",
@@ -108,24 +117,24 @@ export default function Index() {
 
   const handleDownloadPDF = () => {
     const pdf = new jsPDF();
-    
+
     // Add header
     pdf.setFontSize(20);
     pdf.text("Foster Care Allowance Report", 20, 20);
-    
+
     // Add user info
     pdf.setFontSize(12);
     pdf.text(`Name: ${userInfo.name}`, 20, 40);
     pdf.text(`Email: ${userInfo.email}`, 20, 50);
     pdf.text(`Experience: ${userInfo.isExperiencedCarer ? 'Experienced' : 'New'} Carer`, 20, 60);
-    
+
     // Add results
     pdf.text("Weekly Total: £" + result.weeklyTotal.toFixed(2), 20, 80);
     pdf.text("Monthly Total: £" + result.monthlyTotal.toFixed(2), 20, 90);
     pdf.text("Yearly Total: £" + result.yearlyTotal.toFixed(2), 20, 100);
-    
+
     pdf.save("foster-care-allowance.pdf");
-    
+
     toast({
       title: "PDF Downloaded",
       description: "Your report has been downloaded successfully.",
@@ -149,8 +158,11 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className={`min-h-screen ${config?.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50'} py-12 px-4 sm:px-6 lg:px-8`}>
       <div className="max-w-2xl mx-auto">
+        {config?.showLogo && (
+          <img src="/logo.png" alt="Foster Allowance Calculator" className="mb-8 mx-auto h-12" />
+        )}
         <AnimatePresence mode="wait">
           {step === 'info' && (
             <UserInfoForm
@@ -222,7 +234,7 @@ export default function Index() {
             >
               <ResultsDisplay result={result} />
               <Timeline children={children} />
-              
+
               <div className="flex gap-4 mt-6">
                 <Button
                   onClick={() => setStep('children')}
